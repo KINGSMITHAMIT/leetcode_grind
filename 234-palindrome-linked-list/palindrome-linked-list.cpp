@@ -12,26 +12,16 @@ public:
     }
 
     bool isPalindrome(ListNode* head) {
-        if (!head || !head->next) return true;
-
-        // Create a deep copy of the list
-        ListNode* c = new ListNode(0); // Dummy node
-        ListNode* temp = head;
-        ListNode* tempC = c;
-        while (temp) {
-            ListNode* node = new ListNode(temp->val);
-            tempC->next = node;
-            temp = temp->next;
-            tempC = tempC->next;
+        ListNode* slow = head;
+        ListNode* fast = head;
+        while(fast->next!= NULL && fast->next->next!= NULL){
+            slow = slow->next;
+            fast = fast->next->next;
         }
-        c = c->next; // Skip the dummy node
-
-        // Reverse the copied list
-        c = reverseList(c);
-
-        // Compare the original list with the reversed copy
+        //slow is at the left middle/middle
+        ListNode * newHead = reverseList(slow->next);
         ListNode* a = head;
-        ListNode* b = c;
+        ListNode* b = newHead;
         while (a && b) {
             if (a->val != b->val) return false;
             a = a->next;
