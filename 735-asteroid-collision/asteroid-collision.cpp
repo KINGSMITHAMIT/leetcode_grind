@@ -2,11 +2,11 @@ class Solution {
 public:
     vector<int> asteroidCollision(vector<int>& arr) {
         stack<int> st;
-
-        for (int i = 0; i < arr.size(); ++i) {
+        
+        for (int i = 0; i < arr.size(); i++) {
             bool exploded = false;
 
-            while (!st.empty() && arr[i] < 0 && st.top() > 0) {
+            while (!st.empty() && st.top() > 0 && arr[i] < 0) {
                 if (abs(st.top()) < abs(arr[i])) {
                     st.pop();
                 } else if (abs(st.top()) == abs(arr[i])) {
@@ -24,12 +24,12 @@ public:
             }
         }
 
-        vector<int> ans(st.size());
-        for (int i = st.size() - 1; i >= 0; --i) {
-            ans[i] = st.top();
+        vector<int> ans;
+        while (!st.empty()) {
+            ans.push_back(st.top());
             st.pop();
         }
-
+        reverse(ans.begin(), ans.end());
         return ans;
     }
 };
