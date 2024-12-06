@@ -1,10 +1,7 @@
-#include <vector>
-#include <unordered_set>
-
 class Solution {
 public:
-    int maxCount(std::vector<int>& banned, int n, int maxSum) {
-        std::vector<bool> set(10001, false);
+    int maxCount(vector<int>& banned, int n, int maxSum) {
+        vector<bool> set(10001, false);
         for (int ban : banned) {
             set[ban] = true;
         }
