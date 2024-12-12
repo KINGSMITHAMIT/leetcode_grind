@@ -5,41 +5,35 @@ public:
     MyQueue() {
         
     }
-    
+    // 
     void push(int x) {
-        st.push(x);
+        if(st.size() == 0) st.push(x);
+        else{
+            while(st.size()!=0){
+                s.push(st.top());
+                st.pop();
+            }
+            st.push(x);
+        }
+            while(s.size()!=0){
+                st.push(s.top());
+                s.pop();
+            }
     }
     
     int pop() {
-        while(st.size()>0){
-            s.push(st.top());
-            st.pop();
-        }
-        int x = s.top();
-        s.pop();
-        while(s.size()>0){
-            st.push(s.top());
-            s.pop();
-        }
-        return x;
-    }       
-    
-    int peek() {
-        while(st.size()>0){
-            s.push(st.top());
-            st.pop();
-        }
-        int x = s.top();
-        while(s.size()>0){
-            st.push(s.top());
-            s.pop();
-        }
+        int x = st.top();
+        st.pop();
         return x;
     }
     
+    int peek() {
+        return st.top();
+    }
+    
     bool empty() {
-        if(st.size() == 0) return 1;
-        return 0;
+        if(st.size()==0) return 1;
+        else return 0;
     }
 };
 
