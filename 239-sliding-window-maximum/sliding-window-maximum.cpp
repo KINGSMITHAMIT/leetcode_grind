@@ -1,34 +1,33 @@
-// class Solution {
-// public:
-//     vector<int> maxSlidingWindow(vector<int>& arr, int k) {
-//         int n = arr.size();
-//         if(k ==1)   return arr;
-//         if(n == 0 || k==0 ) return {};
-//         stack<int> st;
-//         st.push(arr[n-1]);
-//         vector<int> ans;
-//         ans.push_back(n);
-    
-//         for(int i = n-2; i>=0; i--){
-//             while(st.size() != 0 && arr[st.top()]< arr[i]) st.pop();
-//             if(st.size()== 0) ans.push_back(n);
-//             else ans.push_back(st.top());
-//             st.push(i);
-//         }
-//         reverse(ans.begin(), ans.end());
+class Solution {
+public:
+    vector<int> maxSlidingWindow(vector<int>& arr, int k) {
+        int n = arr.size();
+        if(n == 0 || k==0 ) return {};
+        if(k ==1)  return arr;
+        stack<int> st;
+        st.push(n-1);
+        vector<int> ans;
+        ans.push_back(n);    
+        for(int i = n-2; i>=0; i--){
+            while(st.size() != 0 && arr[st.top()]< arr[i]) st.pop();
+            if(st.size()== 0) ans.push_back(n);
+            else ans.push_back(st.top());
+            st.push(i);
+        }
+        reverse(ans.begin(), ans.end());
         
     
-//     vector<int> result;
-//     for(int i = 0; i< n-k+1; i++){
-//     //For getting all the windows
-//     int j = i;
-//     while(ans[j] < i+k) j = ans[j];
-//     result.push_back(arr[j]);
-//     }
-//         return result;
-//     }
-// };
-
+    vector<int> result;
+    for(int i = 0; i< n-k+1; i++){
+    //For getting all the windows
+    int j = i;
+    while(ans[j] < i+k) j = ans[j];
+    result.push_back(arr[j]);
+    }
+        return result;
+    }
+};
+/*
 class Solution {
 public:
     vector<int> maxSlidingWindow(vector<int>& arr, int k) {
@@ -58,3 +57,4 @@ public:
         return result;
     }
 };
+*/
