@@ -4,7 +4,7 @@
 using namespace std; 
 class Solution {
 public:
-    string repeatLimitedString(std::string s, int repeatLimit) {
+    string repeatLimitedString(string s, int repeatLimit) {
         // Initialize frequency array for characters
         vector<int> freq(26, 0);
         for (char ch : s) {
