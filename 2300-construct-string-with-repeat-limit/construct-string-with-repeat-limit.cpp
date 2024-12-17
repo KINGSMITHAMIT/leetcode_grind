@@ -1,18 +1,18 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-
+using namespace std; 
 class Solution {
 public:
-    std::string repeatLimitedString(std::string s, int repeatLimit) {
+    string repeatLimitedString(std::string s, int repeatLimit) {
         // Initialize frequency array for characters
-        std::vector<int> freq(26, 0);
+        vector<int> freq(26, 0);
         for (char ch : s) {
             freq[ch - 'a']++;
         }
 
         // Use a string builder equivalent
-        std::string result;
+        string result;
         int index = 25; // Start from the largest character
 
         while (index >= 0) {
@@ -21,7 +21,7 @@ public:
                 continue;
             }
 
-            int used = std::min(freq[index], repeatLimit);
+            int used = min(freq[index], repeatLimit);
             for (int k = 0; k < used; k++) {
                 result.push_back('a' + index);
             }
