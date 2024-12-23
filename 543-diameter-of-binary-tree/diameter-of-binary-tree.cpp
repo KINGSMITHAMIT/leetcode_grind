@@ -1,23 +1,19 @@
 class Solution {
 public:
-    int levels(TreeNode* root){
-        if(root == NULL) return 0;
-        return 1 + max(levels(root->left), levels(root->right));
+    int max_diameter = 0;
+    int height(TreeNode* root)
+    {
+        if(root == nullptr)
+        {
+            return 0;
+        }
+        int left_height = height(root->left);
+        int right_height = height(root->right);
+        max_diameter = max(max_diameter,left_height + right_height);
+        return 1+max(left_height,right_height);
     }
-    
     int diameterOfBinaryTree(TreeNode* root) {
-        int maxDia = 0;
-        
-        // Helper function to calculate depth and diameter simultaneously
-        function<int(TreeNode*)> helper = [&](TreeNode* node) -> int {
-            if (node == NULL) return 0;
-            int leftDepth = helper(node->left);
-            int rightDepth = helper(node->right);
-            maxDia = max(maxDia, leftDepth + rightDepth);
-            return 1 + max(leftDepth, rightDepth);
-        };
-        
-        helper(root);
-        return maxDia;
+        int ans = height(root);
+        return max_diameter;
     }
 };
