@@ -4,17 +4,20 @@ public:
         if(root == NULL) return 0;
         return 1 + max(levels(root->left), levels(root->right));
     }
-    void helper(TreeNode*root, int &maxDia){
-        if(root == NULL) return;
-        int dia = levels(root->left) + levels(root->right);
-        maxDia= max(maxDia,dia);
-        helper(root->left, maxDia);
-        helper(root->right, maxDia);
-    }
+    
     int diameterOfBinaryTree(TreeNode* root) {
         int maxDia = 0;
-        helper(root, maxDia);
+        
+        // Helper function to calculate depth and diameter simultaneously
+        function<int(TreeNode*)> helper = [&](TreeNode* node) -> int {
+            if (node == NULL) return 0;
+            int leftDepth = helper(node->left);
+            int rightDepth = helper(node->right);
+            maxDia = max(maxDia, leftDepth + rightDepth);
+            return 1 + max(leftDepth, rightDepth);
+        };
+        
+        helper(root);
         return maxDia;
-        // return levels(root);
     }
 };
