@@ -1,19 +1,15 @@
 class Solution {
 public:
-    void visit(TreeNode* root, string &x){
-        if(root ==NULL) {
-            x+="null";
-            return;
-            }
-        x += root->val;
-        visit(root->left,x);
-        visit(root->right,x);
-    }
+    
     bool isSameTree(TreeNode* p, TreeNode* q) {
-        string a ="", b = "";
-        visit(p,a);
-        visit(q,b);
-        if(a==b) return true;
-        return false;
+        if(p==NULL && q == NULL) return true;
+        if(p==NULL && q != NULL) return false;
+        if(p!=NULL && q == NULL) return false;
+        if(p->val != q->val) return false;
+        bool left = isSameTree(p->left, q->left);
+        if(left == false) return false;
+        bool right = isSameTree(p->right, q->right);
+        if(right == false) return false;
+        return true;
     }
 };
