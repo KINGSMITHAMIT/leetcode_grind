@@ -13,7 +13,7 @@ public:
     //    else return maxDiff;
         //optimal approach - two pointer
 
-        int minEle = nums[0], maxDiff= 0, diff;
+        int minEle = nums[0], maxDiff= INT_MIN, diff;
         for(int i=1; i<nums.size(); i++){
             if(nums[i]>minEle)  {
                 diff = nums[i]  - minEle;
@@ -21,7 +21,7 @@ public:
             }
             else minEle= nums[i];   // if i never get any number bigger than the previous num then i won't be able to update the maxDiff 
         }
-        if(maxDiff == 0)    return -1;
+        if(maxDiff == INT_MIN)    return -1;
         else    return maxDiff;
     }
 };
