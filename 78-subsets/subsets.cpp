@@ -1,23 +1,22 @@
 class Solution {
 public:
-    set<vector<int>>st;
-    void helper(vector<int> &nums, vector<int>subset, int i , int n){
+    vector<vector<int>>ans;
+    void helper(vector<int>& nums, vector<int>&subset, int n , int i){
         if(i>=n){
-            st.insert(subset);
+            ans.push_back(subset);
             return;
         }
         subset.push_back(nums[i]);
-        helper(nums, subset, i+1,n);
-        subset.pop_back(); // backtrack logic
-        //new subset
-        helper(nums, subset, i+1,n);
+        helper(nums, subset, n, i+1);
+        subset.pop_back();
+        helper(nums, subset, n, i+1);
     }
+    
     vector<vector<int>> subsets(vector<int>& nums) {
         int n = nums.size();
-        vector<int> subset;
-        helper(nums, subset, 0, n);
-        vector<vector<int>> ans;
-        for( auto &it : st) ans.push_back(it);
-        return ans; 
+        vector<int>subset;
+        helper(nums, subset, n , 0);
+        return ans;
+        
     }
 };
