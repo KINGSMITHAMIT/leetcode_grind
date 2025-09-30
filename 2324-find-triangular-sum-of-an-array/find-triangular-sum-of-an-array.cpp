@@ -1,11 +1,12 @@
 class Solution {
 public:
     int triangularSum(vector<int>& v) {
-        // vector<int>v=nums;
-        while(v.size()!=1){
-            vector<int>ans;
-            for(int i =0 ; i< v.size()-1; i++) ans.push_back((v[i]+v[i+1])%10);
-            v = move(ans); // this prevents us from making a copy of ans vector and then transfering it in to my vector v the stl of c++ allows us to do in through move which directly empt
+        int n = v.size();
+        while (n > 1) {
+            for (int i = 0; i < n - 1; i++) {
+                v[i] = (v[i] + v[i+1]) % 10;
+            }
+            n--; // reduce effective size
         }
         return v[0];
     }
