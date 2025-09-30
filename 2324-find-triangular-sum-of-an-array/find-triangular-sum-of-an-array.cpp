@@ -1,7 +1,7 @@
 class Solution {
 public:
-    int triangularSum(vector<int>& nums) {
-        vector<int>v=nums;
+    int triangularSum(vector<int>& v) {
+        // vector<int>v=nums;
         while(v.size()!=1){
             vector<int>ans;
             for(int i =0 ; i< v.size()-1; i++) ans.push_back((v[i]+v[i+1])%10);
