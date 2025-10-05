@@ -19,8 +19,8 @@ public:
         
     }
     vector<string> generateParenthesis(int n) {
-        string st="";
-        help(0,n,0,st);
+        // string st="";
+        help(0,n,0,"");
         return ans;   
     }
 };
