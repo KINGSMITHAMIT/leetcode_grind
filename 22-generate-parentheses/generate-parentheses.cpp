@@ -1,26 +1,14 @@
 class Solution {
 public:
     vector<string>ans;
-    void help(int i ,int n, int openBrac, string st){
-        if(i>=(n*2)) {
-           if(openBrac == 0) ans.push_back(st);
-            return;
-        }
-        // i can go with an '(' at the start
-        // st+='(';
-        help(i+1, n, openBrac+1, st+'(');
-        // st.pop_back(); // for backtrack
-        // i can push an ')' only if there is a open brac 
-        if(openBrac >0 ) {
-            // st+=')';
-            help(i+1,n, openBrac-1, st+')');
-            // st.pop_back();
-        }
-        
+    void help(string st, int open ,int close, int n ){
+        // if all my open brac == close brac then i can push this into my ans
+        if(open==n&&close==n&& open==close ){ans.push_back(st);return;}
+        if(open<n) help(st+'(', open+1, close, n);
+        if(open>close) help(st+')', open, close+1,n);
     }
     vector<string> generateParenthesis(int n) {
-        // string st="";
-        help(0,n,0,"");
-        return ans;   
+        help("(",1,0,n);
+        return ans;
     }
 };
