@@ -1,30 +1,20 @@
-/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
- *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
- *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
- *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
- * };
- */
+//APPROACH 2
 class Solution {
 public:
-    void visit(TreeNode* node, string &st){
-        if(node==NULL) {
-            st+=" ";
-            return;
-            }
-        st+=node->val+'0';
-        visit(node->right, st);
-        visit(node->left,st);
-    }
     bool isSameTree(TreeNode* p, TreeNode* q) {
-        string st1="";
-        string st2="";
-        visit(p, st1);
-        visit(q, st2);
-        return st1==st2;
+        //base case 
+        if(p==NULL && q==NULL) return 1;
+        if(p==NULL|| q== NULL) return 0;
+        //LET'S go with checking wether or not the values of each tree are same or not 
+        if(p->val!=q->val)return false;
+        else {
+            // let's check for my left sub tree
+        bool lst= isSameTree(p->left, q->left);
+        if(!lst) return 0;
+        bool rst = isSameTree(p->right , q->right);
+        if(!rst) return 0;
+        }
+        //if by now we havent return 0 then 
+        return 1;
     }
 };
