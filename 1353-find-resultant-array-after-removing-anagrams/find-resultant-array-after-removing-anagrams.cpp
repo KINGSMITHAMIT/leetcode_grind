@@ -1,23 +1,12 @@
 class Solution {
 public:
     bool checkAna(string a, string b){
-        int n = a.length();
-        int m = b.length();
-        if(n!=m) return 0;
+        
+        if(a.length()!=b.length()) return 0;
         else{
-            vector<int>v(26,0);
-            for(auto &it: a){
-                int pos = it-'a';// we are trying to increase the freq right how should we do it like should we i get the chare a-
-                v[pos]++;
-            }
-            for(auto &it: b){
-                int pos = it-'a';// we are trying to increase the freq right how should we do it like should we i get the chare a-
-                v[pos]--;
-            }
-            for(auto &it :v){
-                if(it!=0)return 0;
-            }
-        return 1;
+            sort(a.begin(), a.end());
+            sort(b.begin(), b.end());
+        return (a==b);
         }
     }
     vector<string> removeAnagrams(vector<string>& words) {
