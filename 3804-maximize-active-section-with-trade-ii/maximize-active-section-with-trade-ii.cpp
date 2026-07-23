@@ -1,104 +1,145 @@
-class SparseTable {
-private:
-    vector<vector<int>> st;
-
-public:
-    SparseTable(const vector<int>& data) {
-        st.push_back(data);
-        int i = 1, N = st[0].size();
-        while (2 * i <= N + 1) {
-            const auto& pre = st.back();
-            vector<int> cur;
-            for (int j = 0; j < N - 2 * i + 1; j++) {
-                cur.push_back(max(pre[j], pre[j + i]));
-            }
-            st.push_back(cur);
-            i <<= 1;
-        }
-    }
-
-    int query(int begin, int end) {
-        if (begin > end) {
-            return 0;
-        }
-        int len = end - begin + 1;
-        int lg = 0;
-        while ((1 << (lg + 1)) <= len) {
-            lg++;
-        }
-        return max(st[lg][begin], st[lg][end - (1 << lg) + 1]);
-    }
-};
-
 class Solution {
 public:
     vector<int> maxActiveSectionsAfterTrade(string s,
                                             vector<vector<int>>& queries) {
-        int n = s.length();
+        int n = s.length(), m = queries.size();
         int cnt1 = count(s.begin(), s.end(), '1');
+        // left[i]: represents the length of the continuous block ending at
+        // position i, which is the same as s[i]
+        vector<int> left(n, -1);
+        // right[i]: represents the length of the continuous block starting at
+        // position i with the same value as s[i]
+        vector<int> right(n, -1);
 
-        vector<int> zeroBlocks;
-        vector<int> blockLeft;
-        vector<int> blockRight;
+        for (int i = 0; i < n; i++) {
+            left[i] = (i > 0 && s[i - 1] == s[i]) ? left[i - 1] + 1 : 1;
+        }
+        for (int i = n - 1; i >= 0; i--) {
+            right[i] = (i < n - 1 && s[i + 1] == s[i]) ? right[i + 1] + 1 : 1;
+        }
 
-        int i = 0;
-        while (i < n) {
-            int st = i;
-            while (i < n && s[i] == s[st]) {
-                i += 1;
+        vector<int> ans(m, -1);
+        int block_size = (int)sqrt(n);
+        // query with length greater than block length
+        vector<tuple<int, int, int, int>> longQueries;
+
+        auto brute_force = [&](int l, int r) -> int {
+            int i = l;
+            int best = 0;
+            int prev = INT_MIN;
+
+            while (i <= r) {
+                int start = i;
+                while (i <= r && s[i] == s[start]) {
+                    i++;
+                }
+                if (s[start] == '0') {
+                    int cur = i - start;
+                    best = (prev != INT_MIN && prev + cur > best) ? prev + cur
+                                                                  : best;
+                    prev = cur;
+                }
             }
-            if (s[st] == '0') {
-                zeroBlocks.push_back(i - st);
-                blockLeft.push_back(st);
-                blockRight.push_back(i - 1);
+            return best;
+        };
+
+        for (int i = 0; i < m; i++) {
+            int l = queries[i][0], r = queries[i][1];
+            if (r - l + 1 > block_size) {
+                longQueries.push_back({l / block_size, l, r, i});
+            } else {
+                // queries shorter than block length, brute-force calculation
+                ans[i] = cnt1 + brute_force(l, r);
             }
         }
 
-        int m = zeroBlocks.size();
-        if (m < 2) {  // continuous 0 blocks less than 2 segments, return the
-                      // answer directly
-            return vector<int>(queries.size(), cnt1);
-        }
-        vector<int> tmpSum(m - 1);
-        for (int i = 0; i < m - 1; i++) {
-            tmpSum[i] = zeroBlocks[i] + zeroBlocks[i + 1];
-        }
-        SparseTable st(tmpSum);
-        vector<int> ans;
+        // sort by the ID of the block where the left endpoint is located as the
+        // first keyword, and by the right endpoint as the second keyword
+        sort(longQueries.begin(), longQueries.end(),
+             [](const tuple<int, int, int, int>& a,
+                const tuple<int, int, int, int>& b) {
+                 if (get<0>(a) != get<0>(b)) return get<0>(a) < get<0>(b);
+                 return get<2>(a) < get<2>(b);
+             });
 
-        for (const auto& q : queries) {
-            int l = q[0], r = q[1];
-            int i = lower_bound(blockRight.begin(), blockRight.end(), l) -
-                    blockRight.begin();
-            int j = upper_bound(blockLeft.begin(), blockLeft.end(), r) -
-                    blockLeft.begin() - 1;
+        deque<int> subZeroBlocks;
+        int L = 0, R = 0, bestGain = 0;
 
-            // at most 1 continuous block of 0s within the substring
-            if (i > m - 1 || j < 0 || i >= j) {
-                ans.push_back(cnt1);
-                continue;
+        for (int i = 0; i < longQueries.size(); i++) {
+            int bid = get<0>(longQueries[i]);
+            int l = get<1>(longQueries[i]);
+            int r = get<2>(longQueries[i]);
+            int qid = get<3>(longQueries[i]);
+
+            if (i == 0 || bid > get<0>(longQueries[i - 1])) {
+                // traverse to a new block, perform initialization operations
+                L = (bid + 1) * block_size -
+                    1;  // L is initialized as the right endpoint of the block
+                R = (bid + 1) * block_size;  // R is initialized to the left
+                                             // endpoint of the next block
+                subZeroBlocks.clear();
+                bestGain = 0;
             }
 
-            int firstLen = blockRight[i] - max(blockLeft[i], l) +
-                           1;  // actual length of the first consecutive block
-                               // of 0s in the substring
-            int lastLen = min(blockRight[j], r) - blockLeft[j] +
-                          1;  // actual length of the last consecutive block of
-                              // 0s in the substring
-            // exactly 2 consecutive 0 blocks within the substring
-            if (i + 1 == j) {
-                int bestGain = firstLen + lastLen;
-                ans.push_back(cnt1 + bestGain);
-                continue;
+            while (R <= r) {
+                int sz = min(r - R + 1, right[R]);
+                if (s[R] == '0') {
+                    if (!subZeroBlocks.empty() && s[R - 1] == '0') {
+                        subZeroBlocks.back() += sz;
+                    } else {
+                        subZeroBlocks.push_back(sz);
+                    }
+                    if (subZeroBlocks.size() >= 2) {
+                        bestGain =
+                            max(subZeroBlocks.back() +
+                                    subZeroBlocks[subZeroBlocks.size() - 2],
+                                bestGain);
+                    }
+                }
+                R += sz;
             }
 
-            int val1 = firstLen + zeroBlocks[i + 1];
-            int val2 = zeroBlocks[j - 1] + lastLen;
-            int val3 = st.query(i + 1, j - 2);
-            int bestGain = max({val1, val2, val3});
-            ans.push_back(cnt1 + bestGain);
-        }
+            // before moving the left endpoint L, backup the value of bestGain
+            int tmp_bestGain = bestGain;
+            // value of the first element of subZeroBlocks before moving the
+            // left endpoint
+            int tmp_firstValue =
+                subZeroBlocks.empty() ? -1 : subZeroBlocks.front();
+            // the number of digits added from the left during the process of
+            // recording the movement of the left endpoint L
+            int cnt = 0;
 
+            while (L >= l) {
+                int sz = min(L - l + 1, left[L]);
+                if (s[L] == '0') {
+                    if (!subZeroBlocks.empty() && s[L + 1] == '0') {
+                        subZeroBlocks.front() += sz;
+                    } else {
+                        subZeroBlocks.push_front(sz);
+                        cnt++;
+                    }
+                    if (subZeroBlocks.size() >= 2) {
+                        bestGain =
+                            max(subZeroBlocks[0] + subZeroBlocks[1], bestGain);
+                    }
+                }
+                L -= sz;
+            }
+
+            // answering inquiries
+            ans[qid] = bestGain + cnt1;
+            // restore left endpoint L
+            L = (bid + 1) * block_size - 1;
+            // restore bestGain
+            bestGain = tmp_bestGain;
+            // restore subZeroBlocks
+            for (int j = 0; j < cnt; j++) {
+                subZeroBlocks.pop_front();
+            }
+            if (tmp_firstValue != -1) {
+                subZeroBlocks[0] = tmp_firstValue;
+            }
+        }
         return ans;
     }
 };
