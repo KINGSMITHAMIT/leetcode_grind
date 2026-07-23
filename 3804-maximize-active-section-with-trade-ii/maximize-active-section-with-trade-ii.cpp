@@ -1,51 +1,32 @@
-class SegmentTree {
+class SparseTable {
 private:
-    int n;
-    vector<int> arr;
-    vector<int> seg;
-
-    void build(int p, int l, int r) {
-        if (l == r) {
-            seg[p] = arr[l];
-            return;
-        }
-
-        int mid = (l + r) >> 1;
-        build(p << 1, l, mid);
-        build(p << 1 | 1, mid + 1, r);
-        seg[p] = max(seg[p << 1], seg[p << 1 | 1]);
-    }
-
-    int _query(int p, int l, int r, int L, int R) {
-        if (L <= l && r <= R) {
-            return seg[p];
-        }
-
-        int mid = (l + r) >> 1;
-        int res = 0;
-        if (L <= mid) {
-            res = max(res, _query(p << 1, l, mid, L, R));
-        }
-        if (R > mid) {
-            res = max(res, _query(p << 1 | 1, mid + 1, r, L, R));
-        }
-
-        return res;
-    }
+    vector<vector<int>> st;
 
 public:
-    SegmentTree(const vector<int>& arr) : arr(arr) {
-        n = arr.size();
-        seg.resize(n << 2, 0);
-        build(1, 0, n - 1);
+    SparseTable(const vector<int>& data) {
+        st.push_back(data);
+        int i = 1, N = st[0].size();
+        while (2 * i <= N + 1) {
+            const auto& pre = st.back();
+            vector<int> cur;
+            for (int j = 0; j < N - 2 * i + 1; j++) {
+                cur.push_back(max(pre[j], pre[j + i]));
+            }
+            st.push_back(cur);
+            i <<= 1;
+        }
     }
 
-    int query(int L, int R) {
-        if (L > R) {
+    int query(int begin, int end) {
+        if (begin > end) {
             return 0;
         }
-
-        return _query(1, 0, n - 1, L, R);
+        int len = end - begin + 1;
+        int lg = 0;
+        while ((1 << (lg + 1)) <= len) {
+            lg++;
+        }
+        return max(st[lg][begin], st[lg][end - (1 << lg) + 1]);
     }
 };
 
@@ -78,12 +59,11 @@ public:
                       // answer directly
             return vector<int>(queries.size(), cnt1);
         }
-
         vector<int> tmpSum(m - 1);
         for (int i = 0; i < m - 1; i++) {
             tmpSum[i] = zeroBlocks[i] + zeroBlocks[i + 1];
         }
-        SegmentTree seg(tmpSum);
+        SparseTable st(tmpSum);
         vector<int> ans;
 
         for (const auto& q : queries) {
@@ -98,6 +78,7 @@ public:
                 ans.push_back(cnt1);
                 continue;
             }
+
             int firstLen = blockRight[i] - max(blockLeft[i], l) +
                            1;  // actual length of the first consecutive block
                                // of 0s in the substring
@@ -113,7 +94,7 @@ public:
 
             int val1 = firstLen + zeroBlocks[i + 1];
             int val2 = zeroBlocks[j - 1] + lastLen;
-            int val3 = seg.query(i + 1, j - 2);
+            int val3 = st.query(i + 1, j - 2);
             int bestGain = max({val1, val2, val3});
             ans.push_back(cnt1 + bestGain);
         }
