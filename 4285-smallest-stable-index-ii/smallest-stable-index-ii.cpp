@@ -9,9 +9,12 @@ public:
         // like we will iterate from the back to the front to get the minimum index from i to n-1
         int minE = INT_MAX, maxE = INT_MIN, n =nums.size();
         vector<int>minEle(n);
-        for(int i =n-1; i>=0; i--){
-            minE = min(minE, nums[i]); 
-            minEle[i]=minE;          
+        minEle[n-1] = nums[n-1]; 
+        for(int i =n-2; i>=0; i--){
+            // minE = min(minE, nums[i]); 
+            // minEle[i]=minE;     
+                        minEle[i] = min(minEle[i + 1], nums[i]);
+     
         }
         // let's iterate over to get the max index ele from 0 to n-1
         for(int i = 0; i<n; i++){
